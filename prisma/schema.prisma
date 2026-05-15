@@ -1,0 +1,127 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model User {
+  id           String   @id @default(cuid())
+  username     String   @unique
+  passwordHash String
+  avatar       String   @default("")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  wallet         Wallet?          @relation
+  transactions   Transaction[]    @relation("FromUser")
+  receivedTxs    Transaction[]    @relation("ToUser")
+  publishedTasks Task[]           @relation("Publisher")
+  assignedTasks  Task[]           @relation("Assignee")
+  applications   TaskApplication[]
+  posts          Post[]
+  comments       Comment[]
+
+  @@map("users")
+}
+
+model Wallet {
+  id      String @id @default(cuid())
+  userId  String @unique @map("user_id")
+  balance Int    @default(0)
+
+  user User? @relation(fields: [userId], references: [id])
+
+  @@map("wallets")
+}
+
+model Transaction {
+  id         String   @id @default(cuid())
+  fromUserId String   @map("from_user_id")
+  toUserId   String   @map("to_user_id")
+  amount     Int
+  type       String
+  taskId     String?  @map("task_id")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  fromUser User @relation("FromUser", fields: [fromUserId], references: [id])
+  toUser   User @relation("ToUser", fields: [toUserId], references: [id])
+
+  @@map("transactions")
+}
+
+model Task {
+  id             String    @id @default(cuid())
+  publisherId    String    @map("publisher_id")
+  assignedUserId String?   @map("assigned_user_id")
+  title          String
+  description    String
+  rewardSb       Int       @map("reward_sb")
+  status         String    @default("open")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  deadline       DateTime?
+
+  publisher    User              @relation("Publisher", fields: [publisherId], references: [id])
+  assignee     User?             @relation("Assignee", fields: [assignedUserId], references: [id])
+  applications TaskApplication[]
+
+  @@map("tasks")
+}
+
+model TaskApplication {
+  id          String   @id @default(cuid())
+  taskId      String   @map("task_id")
+  applicantId String   @map("applicant_id")
+  message     String   @default("")
+  status      String   @default("pending")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  task      Task @relation(fields: [taskId], references: [id])
+  applicant User @relation(fields: [applicantId], references: [id])
+
+  @@unique([taskId, applicantId])
+  @@map("task_applications")
+}
+
+model Board {
+  id          String @id @default(cuid())
+  name        String @unique
+  description String @default("")
+  sortOrder   Int    @default(0) @map("sort_order")
+
+  posts Post[]
+
+  @@map("boards")
+}
+
+model Post {
+  id        String   @id @default(cuid())
+  boardId   String   @map("board_id")
+  authorId  String   @map("author_id")
+  title     String
+  content   String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  board    Board     @relation(fields: [boardId], references: [id])
+  author   User      @relation(fields: [authorId], references: [id])
+  comments Comment[]
+
+  @@map("posts")
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  postId    String   @map("post_id")
+  authorId  String   @map("author_id")
+  content   String
+  parentId  String?  @map("parent_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  post     Post      @relation(fields: [postId], references: [id])
+  author   User      @relation(fields: [authorId], references: [id])
+  parent   Comment?  @relation("CommentReplies", fields: [parentId], references: [id])
+  replies  Comment[] @relation("CommentReplies")
+
+  @@map("comments")
+}
