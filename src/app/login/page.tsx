@@ -14,22 +14,26 @@ export default function LoginPage() {
     setLoading(true);
     setError("");
 
-    const form = new FormData(e.currentTarget);
-    const res = await fetch("/api/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        username: form.get("username"),
-        password: form.get("password"),
-      }),
-    });
+    try {
+      const form = new FormData(e.currentTarget);
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          username: form.get("username"),
+          password: form.get("password"),
+        }),
+      });
 
-    if (res.ok) {
-      router.push("/");
-      router.refresh();
-    } else {
-      const data = await res.json();
-      setError(data.error || "登录失败");
+      if (res.ok) {
+        router.push("/");
+        router.refresh();
+      } else {
+        const data = await res.json();
+        setError(data.error || "登录失败");
+      }
+    } catch {
+      setError("网络错误，请稍后重试");
     }
     setLoading(false);
   }
