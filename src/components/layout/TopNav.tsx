@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getCurrentUser } from "@/lib/auth";
 import { SBBadge } from "@/components/shared/SBBadge";
 import { UserAvatar } from "@/components/shared/UserAvatar";
+import { LogoutButton } from "./LogoutButton";
 
 export async function TopNav() {
   const user = await getCurrentUser();
@@ -25,6 +26,7 @@ export async function TopNav() {
               <Link href={`/profile/${user.id}`}>
                 <UserAvatar username={user.username} />
               </Link>
+              <LogoutButton />
             </>
           ) : (
             <Link href="/login" className="text-sm text-blue-600 hover:underline">
