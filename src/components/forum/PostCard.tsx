@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { UserAvatar } from "@/components/shared/UserAvatar";
 
 interface PostCardProps {
   post: {
@@ -13,10 +14,13 @@ interface PostCardProps {
 
 export function PostCard({ post, boardId }: PostCardProps) {
   return (
-    <Link href={`/forum/${boardId}/${post.id}`} className="block bg-white rounded-lg border p-4 hover:shadow-md transition-shadow">
-      <h3 className="font-semibold text-gray-900">{post.title}</h3>
-      <div className="mt-2 flex items-center gap-3 text-sm text-gray-500">
-        <span>@{post.author.username}</span>
+    <Link href={`/forum/${boardId}/${post.id}`} className="block py-4 border-b border-gray-100 hover:bg-gray-50 px-1 -mx-1 transition-colors">
+      <h3 className="text-base font-semibold text-gray-900 leading-snug">{post.title}</h3>
+      <div className="mt-2 flex items-center gap-3 text-xs text-gray-400">
+        <div className="flex items-center gap-1.5">
+          <UserAvatar username={post.author.username} size={18} />
+          <span className="text-gray-500">{post.author.username}</span>
+        </div>
         <span>{post._count.comments} 条评论</span>
         <span>{new Date(post.createdAt).toLocaleDateString("zh-CN")}</span>
       </div>

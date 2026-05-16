@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { UserAvatar } from "@/components/shared/UserAvatar";
 import { CommentForm } from "./CommentForm";
 
 interface CommentData {
@@ -16,30 +17,33 @@ function CommentItem({ comment, postId, depth = 0 }: { comment: CommentData; pos
   const [showReply, setShowReply] = useState(false);
 
   return (
-    <div className={`${depth > 0 ? "ml-6 border-l-2 border-gray-100 pl-3" : ""}`}>
-      <div className="py-2">
-        <div className="flex items-center gap-2 text-sm">
-          <span className="font-medium">@{comment.author.username}</span>
-          <span className="text-gray-400 text-xs">
+    <div className={depth > 0 ? "ml-10" : ""}>
+      <div className="py-3 border-b border-gray-50">
+        <div className="flex items-center gap-2 mb-1.5">
+          <UserAvatar username={comment.author.username} size={22} />
+          <span className="text-sm font-medium text-gray-800">{comment.author.username}</span>
+          <span className="text-xs text-gray-400">
             {new Date(comment.createdAt).toLocaleString("zh-CN")}
           </span>
         </div>
-        <p className="text-gray-700 text-sm mt-1">{comment.content}</p>
-        <button
-          onClick={() => setShowReply(!showReply)}
-          className="text-xs text-gray-400 hover:text-blue-500 mt-1"
-        >
-          {showReply ? "取消回复" : "回复"}
-        </button>
-        {showReply && (
-          <div className="mt-2">
-            <CommentForm
-              postId={postId}
-              parentId={comment.id}
-              onSuccess={() => setShowReply(false)}
-            />
-          </div>
-        )}
+        <p className="text-sm text-gray-800 leading-relaxed ml-[30px]">{comment.content}</p>
+        <div className="ml-[30px] mt-1.5">
+          <button
+            onClick={() => setShowReply(!showReply)}
+            className="text-xs text-gray-400 hover:text-[#0066FF]"
+          >
+            {showReply ? "取消回复" : "回复"}
+          </button>
+          {showReply && (
+            <div className="mt-2 mb-1">
+              <CommentForm
+                postId={postId}
+                parentId={comment.id}
+                onSuccess={() => setShowReply(false)}
+              />
+            </div>
+          )}
+        </div>
       </div>
       {comment.replies?.map((reply) => (
         <CommentItem key={reply.id} comment={reply} postId={postId} depth={depth + 1} />
@@ -49,7 +53,6 @@ function CommentItem({ comment, postId, depth = 0 }: { comment: CommentData; pos
 }
 
 export function CommentTree({ comments, postId }: { comments: CommentData[]; postId: string }) {
-  // Build tree: parent → children map
   const roots: CommentData[] = [];
   const map = new Map<string, CommentData>();
 
@@ -66,7 +69,7 @@ export function CommentTree({ comments, postId }: { comments: CommentData[]; pos
   });
 
   return (
-    <div className="divide-y">
+    <div>
       {roots.map((comment) => (
         <CommentItem key={comment.id} comment={comment} postId={postId} />
       ))}

@@ -16,6 +16,7 @@ export function CommentForm({ postId, parentId, onSuccess }: CommentFormProps) {
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (!content.trim()) return;
     setError("");
     try {
       const res = await fetch(`/api/forum/posts/${postId}/comments`, {
@@ -37,17 +38,20 @@ export function CommentForm({ postId, parentId, onSuccess }: CommentFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-2">
-      {error && <div className="bg-red-50 text-red-600 p-1 rounded text-xs">{error}</div>}
+    <form onSubmit={handleSubmit}>
+      {error && <div className="text-red-500 text-xs mb-2">{error}</div>}
       <textarea
         value={content}
         onChange={(e) => setContent(e.target.value)}
-        placeholder={parentId ? "回复..." : "写下你的评论..."}
-        rows={2}
-        required
-        className="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        placeholder={parentId ? "写下你的回复..." : "写下你的评论..."}
+        rows={3}
+        className="w-full px-0 py-2 text-sm placeholder-gray-400 focus:outline-none border-b border-gray-200 focus:border-gray-400 resize-none bg-transparent transition-colors"
       />
-      <button type="submit" className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700">发表</button>
+      <div className="flex justify-end mt-2">
+        <button type="submit" className="text-sm text-white bg-[#0066FF] hover:bg-[#0055DD] px-5 py-1.5 transition-colors">
+          发布
+        </button>
+      </div>
     </form>
   );
 }

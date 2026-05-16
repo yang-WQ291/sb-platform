@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { UserAvatar } from "@/components/shared/UserAvatar";
 import { CommentTree } from "@/components/forum/CommentTree";
 import { CommentForm } from "@/components/forum/CommentForm";
 
@@ -31,34 +32,52 @@ export default async function PostDetailPage({
   });
 
   return (
-    <div className="max-w-2xl mx-auto">
-      <Link href={`/forum/${boardId}`} className="text-sm text-gray-400 hover:underline mb-2 inline-block">
+    <div className="max-w-[650px] mx-auto">
+      <Link href={`/forum/${boardId}`} className="text-sm text-gray-400 hover:text-gray-600 mb-4 inline-block">
         &larr; 返回 {post.board.name}
       </Link>
 
-      <div className="bg-white rounded-xl border p-6 mb-4">
-        <h1 className="text-xl font-bold mb-2">{post.title}</h1>
-        <p className="text-gray-600 whitespace-pre-wrap mb-4">{post.content}</p>
-        <div className="text-sm text-gray-400">
-          @{post.author.username} · {new Date(post.createdAt).toLocaleString("zh-CN")}
+      {/* Post Header */}
+      <article>
+        <h1 className="text-2xl font-bold text-gray-900 leading-snug mb-4">{post.title}</h1>
+
+        {/* Author bar */}
+        <div className="flex items-center gap-3 pb-4 mb-4 border-b border-gray-100">
+          <Link href={`/profile/${post.author.id}`} className="flex items-center gap-2 hover:opacity-80">
+            <UserAvatar username={post.author.username} size={36} />
+            <div>
+              <p className="text-sm font-medium text-gray-900">{post.author.username}</p>
+              <p className="text-xs text-gray-400">{new Date(post.createdAt).toLocaleString("zh-CN")}</p>
+            </div>
+          </Link>
         </div>
+
+        {/* Post body */}
+        <div className="text-base text-gray-800 leading-relaxed whitespace-pre-wrap mb-8">
+          {post.content}
+        </div>
+      </article>
+
+      {/* Actions bar */}
+      <div className="flex items-center gap-6 py-3 border-t border-b border-gray-100 mb-6 text-sm text-gray-500">
+        <span>{comments.length} 条评论</span>
       </div>
 
-      <div className="bg-white rounded-xl border p-6 mb-4">
-        <h3 className="font-semibold mb-4">评论 ({comments.length})</h3>
+      {/* Comments */}
+      <div className="mb-8">
         {user ? (
-          <div className="mb-4 pb-4 border-b">
+          <div className="mb-6">
             <CommentForm postId={postId} />
           </div>
         ) : (
-          <p className="text-sm text-gray-400 mb-4">
-            <Link href="/login" className="text-blue-600 hover:underline">登录</Link>后参与评论
+          <p className="text-sm text-gray-400 mb-6">
+            <Link href="/login" className="text-[#0066FF] hover:underline">登录</Link>后参与评论
           </p>
         )}
         {comments.length > 0 ? (
           <CommentTree comments={comments} postId={postId} />
         ) : (
-          <p className="text-gray-400 text-sm text-center py-4">暂无评论</p>
+          <p className="text-gray-400 text-sm text-center py-8">暂无评论，来说点什么吧</p>
         )}
       </div>
     </div>

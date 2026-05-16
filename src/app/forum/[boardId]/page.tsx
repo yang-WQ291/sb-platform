@@ -27,19 +27,23 @@ export default async function BoardPage({
 
   return (
     <div>
-      <Link href="/forum" className="text-sm text-gray-400 hover:underline mb-2 inline-block">&larr; 返回版块列表</Link>
-      <div className="flex items-center justify-between mb-6">
+      <Link href="/forum" className="text-sm text-gray-400 hover:text-gray-600 mb-2 inline-block">&larr; 返回版块列表</Link>
+      <div className="flex items-center justify-between mb-4">
         <div>
-          <h1 className="text-2xl font-bold">{board.name}</h1>
-          <p className="text-sm text-gray-500">{board.description}</p>
+          <h1 className="text-xl font-bold text-gray-900">{board.name}</h1>
+          <p className="text-sm text-gray-500 mt-0.5">{board.description}</p>
         </div>
       </div>
 
-      {user && <CreatePostForm boardId={boardId} />}
+      {user && (
+        <div className="mb-4">
+          <CreatePostForm boardId={boardId} />
+        </div>
+      )}
 
-      <div className="mt-4 grid gap-3">
+      <div>
         {posts.length === 0 ? (
-          <p className="text-gray-400 text-center py-8">还没有帖子，来发第一个吧</p>
+          <p className="text-gray-400 text-center py-12 text-sm">还没有帖子，来发第一个吧</p>
         ) : (
           posts.map((post) => <PostCard key={post.id} post={post} boardId={boardId} />)
         )}
