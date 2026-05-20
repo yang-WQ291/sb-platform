@@ -1,14 +1,14 @@
-import { NextResponse } from "next/server";
-import { getCurrentUser } from "@/lib/auth";
+import { NextRequest, NextResponse } from "next/server";
+import { getUserIdFromRequest } from "@/lib/auth";
 import { getWallet, getTransactions } from "@/lib/wallet";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const user = await getCurrentUser();
-    if (!user) return NextResponse.json({ error: "请先登录" }, { status: 401 });
+    const currentUserId = await getUserIdFromRequest(request);
+    if (!currentUserId) return NextResponse.json({ error: "请先登录" }, { status: 401 });
 
-    const wallet = await getWallet(user.id);
-    const { transactions } = await getTransactions(user.id);
+    const wallet = await getWallet(currentUserId);
+    const { transactions } = await getTransactions(currentUserId);
 
     return NextResponse.json({
       balance: wallet?.balance ?? 0,

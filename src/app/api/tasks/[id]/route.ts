@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getCurrentUser } from "@/lib/auth";
+import { getUserIdFromRequest } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
 export async function PATCH(
@@ -7,8 +7,8 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const user = await getCurrentUser();
-    if (!user) return NextResponse.json({ error: "请先登录" }, { status: 401 });
+    const currentUserId = await getUserIdFromRequest(request);
+    if (!currentUserId) return NextResponse.json({ error: "请先登录" }, { status: 401 });
 
     const { id } = await params;
     const { action } = await request.json();
@@ -16,7 +16,7 @@ export async function PATCH(
     const task = await prisma.task.findUnique({ where: { id } });
     if (!task) return NextResponse.json({ error: "任务不存在" }, { status: 404 });
 
-    if (action === "complete" && task.publisherId === user.id && task.status === "in_progress") {
+    if (action === "complete" && task.publisherId === currentUserId && task.status === "in_progress") {
       const updated = await prisma.$transaction(async (tx) => {
         await tx.task.update({ where: { id }, data: { status: "completed" } });
 
@@ -40,19 +40,19 @@ export async function PATCH(
       return NextResponse.json(updated);
     }
 
-    if (action === "cancel" && task.publisherId === user.id && task.status === "open") {
+    if (action === "cancel" && task.publisherId === currentUserId && task.status === "open") {
       const updated = await prisma.$transaction(async (tx) => {
         await tx.task.update({ where: { id }, data: { status: "cancelled" } });
 
         await tx.wallet.update({
-          where: { userId: user.id },
+          where: { userId: currentUserId },
           data: { balance: { increment: task.rewardSb } },
         });
 
         await tx.transaction.create({
           data: {
-            fromUserId: user.id,
-            toUserId: user.id,
+            fromUserId: currentUserId,
+            toUserId: currentUserId,
             amount: task.rewardSb,
             type: "task_refund",
             taskId: id,

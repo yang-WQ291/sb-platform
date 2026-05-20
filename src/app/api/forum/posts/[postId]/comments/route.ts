@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getCurrentUser } from "@/lib/auth";
+import { getUserIdFromRequest } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
 export async function POST(
@@ -7,8 +7,8 @@ export async function POST(
   { params }: { params: Promise<{ postId: string }> }
 ) {
   try {
-    const user = await getCurrentUser();
-    if (!user) return NextResponse.json({ error: "请先登录" }, { status: 401 });
+    const currentUserId = await getUserIdFromRequest(request);
+    if (!currentUserId) return NextResponse.json({ error: "请先登录" }, { status: 401 });
 
     const { postId } = await params;
     const { content, parentId } = await request.json();
@@ -20,7 +20,7 @@ export async function POST(
     const comment = await prisma.comment.create({
       data: {
         postId,
-        authorId: user.id,
+        authorId: currentUserId,
         content,
         parentId: parentId || null,
       },

@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getCurrentUser } from "@/lib/auth";
+import { getUserIdFromRequest } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
 export async function POST(request: NextRequest) {
   try {
-    const user = await getCurrentUser();
-    if (!user) return NextResponse.json({ error: "请先登录" }, { status: 401 });
+    const currentUserId = await getUserIdFromRequest(request);
+    if (!currentUserId) return NextResponse.json({ error: "请先登录" }, { status: 401 });
 
     const { title, description, rewardSb, deadline } = await request.json();
 
@@ -13,20 +13,21 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "请填写完整信息，悬赏金额至少为1" }, { status: 400 });
     }
 
-    if (user.wallet!.balance < rewardSb) {
+    const wallet = await prisma.wallet.findUnique({ where: { userId: currentUserId } });
+    if (!wallet || wallet.balance < rewardSb) {
       return NextResponse.json({ error: "SB 余额不足" }, { status: 400 });
     }
 
     const task = await prisma.$transaction(async (tx) => {
       await tx.wallet.update({
-        where: { userId: user.id },
+        where: { userId: currentUserId },
         data: { balance: { decrement: rewardSb } },
       });
 
       await tx.transaction.create({
         data: {
-          fromUserId: user.id,
-          toUserId: user.id,
+          fromUserId: currentUserId,
+          toUserId: currentUserId,
           amount: rewardSb,
           type: "task_lock",
         },
@@ -34,7 +35,7 @@ export async function POST(request: NextRequest) {
 
       return tx.task.create({
         data: {
-          publisherId: user.id,
+          publisherId: currentUserId,
           title,
           description,
           rewardSb,
