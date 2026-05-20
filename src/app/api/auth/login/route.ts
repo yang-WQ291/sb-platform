@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { verifyPassword, getSession } from "@/lib/auth";
+import { verifyPassword, getSession, signToken } from "@/lib/auth";
 
 export async function POST(request: NextRequest) {
   try {
@@ -20,7 +20,12 @@ export async function POST(request: NextRequest) {
     session.userId = user.id;
     await session.save();
 
-    return NextResponse.json({ id: user.id, username: user.username });
+    const token = signToken(user.id);
+
+    return NextResponse.json({
+      token,
+      user: { id: user.id, username: user.username },
+    });
   } catch {
     return NextResponse.json({ error: "服务器错误" }, { status: 500 });
   }
