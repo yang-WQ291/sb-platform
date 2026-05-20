@@ -45,3 +45,10 @@ yarn-error.log*
 next-env.d.ts
 
 /src/generated/prisma
+
+# Expo
+mobile/.expo/
+mobile/dist/
+mobile/android/
+mobile/ios/
+mobile/node_modules/
