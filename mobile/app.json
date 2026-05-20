@@ -1,0 +1,18 @@
+{
+  "expo": {
+    "name": "SB社区",
+    "slug": "sb-platform",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "sbplatform",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "ios": { "supportsTablet": false },
+    "android": {
+      "adaptiveIcon": { "backgroundColor": "#fef7ed" },
+      "package": "com.sbplatform.app"
+    },
+    "plugins": ["expo-router", "expo-secure-store"],
+    "experiments": { "typedRoutes": true }
+  }
+}
