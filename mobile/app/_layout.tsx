@@ -19,9 +19,13 @@ export default function RootLayout() {
 
   useEffect(() => {
     if (!isReady) return;
+    const isAuthPage = segments[0] === "login" || segments[0] === "register";
     const inAuthGroup = segments[0] === "(tabs)";
-    if (!isAuthed && inAuthGroup) {
+
+    if (!isAuthed && !isAuthPage) {
       router.replace("/login");
+    } else if (isAuthed && isAuthPage) {
+      router.replace("/(tabs)");
     }
   }, [isReady, isAuthed, segments]);
 

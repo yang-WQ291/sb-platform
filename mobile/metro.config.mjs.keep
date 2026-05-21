@@ -1,0 +1,11 @@
+import { getDefaultConfig } from "expo/metro-config";
+import path from "path";
+import { fileURLToPath } from "url";
+import { createRequire } from "module";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const require = createRequire(import.meta.url);
+const { withNativeWind } = require("nativewind/metro");
+
+const config = getDefaultConfig(__dirname);
+export default withNativeWind(config, { input: path.resolve(__dirname, "global.css") });

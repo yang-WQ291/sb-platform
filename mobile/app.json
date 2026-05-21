@@ -7,12 +7,35 @@
     "scheme": "sbplatform",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
-    "ios": { "supportsTablet": false },
+    "ios": {
+      "supportsTablet": false
+    },
     "android": {
-      "adaptiveIcon": { "backgroundColor": "#fef7ed" },
+      "adaptiveIcon": {
+        "backgroundColor": "#fef7ed"
+      },
       "package": "com.sbplatform.app"
     },
-    "plugins": ["expo-router", "expo-secure-store"],
-    "experiments": { "typedRoutes": true }
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      "expo-updates"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "75d6318e-d5f2-4c95-aedc-2147b60e7a4a"
+      }
+    },
+    "owner": "yang-wq291s-organization",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/75d6318e-d5f2-4c95-aedc-2147b60e7a4a"
+    }
   }
 }
