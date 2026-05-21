@@ -3,6 +3,7 @@ import { Stack, useRouter, useSegments } from "expo-router";
 import { View, ActivityIndicator } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { getToken } from "../lib/auth";
+import "../global.css";
 
 export default function RootLayout() {
   const [isReady, setIsReady] = useState(false);
